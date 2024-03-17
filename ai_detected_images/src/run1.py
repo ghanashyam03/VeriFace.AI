@@ -11,12 +11,12 @@ import threading
 
 app = Flask(__name__, static_url_path='/static')
 
-# Load FaceNet model
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 mtcnn = MTCNN(keep_all=True, device=device)
 
-# Function to determine if an image is AI-generated based on API response
+
 def is_ai_generated(image_path):
     API_URL = "https://api-inference.huggingface.co/models/umm-maybe/AI-image-detector"
     headers = {"Authorization": "Bearer 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"}
@@ -26,7 +26,7 @@ def is_ai_generated(image_path):
     
     response = requests.post(API_URL, headers=headers, data=data)
     result = response.json()
-    print("API Response:", result)  # Debugging
+    print("API Response:", result) 
     
     for item in result:
         if item['label'] == 'artificial' and item['score'] > 0.50:
@@ -34,7 +34,7 @@ def is_ai_generated(image_path):
     return False
 
 
-# Function to extract face embeddings
+
 def extract_face_embeddings(image):
     faces = mtcnn(image)
     if faces is not None:
