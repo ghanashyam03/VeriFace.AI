@@ -1,0 +1,58 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Face Detection</h1>
+        <button id="startBtn" onclick="startDetection()">Detect</button>
+        <button id="stopBtn" style="display:none;" onclick="stopDetection()">Stop</button>
+        <div class="video-container">
+            <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Video feed">
+        </div>
+        <div id="result" style="display:none;">
+            <p id="match-status"></p>
+            <p id="match-percentage"></p>
+        </div>
+    </div>
+    <script>
+        let intervalId;
+
+        function startDetection() {
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+            document.getElementById('result').style.display = 'block';
+
+            intervalId = setInterval(fetchResults, 1000);
+        }
+
+        function stopDetection() {
+            clearInterval(intervalId);
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+        }
+
+        function fetchResults() {
+            fetch('/detection/detect')  // Updated endpoint
+                .then(response => response.json())
+                .then(data => {
+                    if (data.match_found) {
+                        document.getElementById('match-status').innerText = 'Match found!';
+                        document.getElementById('match-percentage').innerText = 'Match percentage: ' + data.match_percentage;
+                    } else {
+                        document.getElementById('match-status').innerText = 'No match found!';
+                        document.getElementById('match-percentage').innerText = '';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

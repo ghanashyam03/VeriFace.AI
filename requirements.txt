@@ -1,0 +1,7 @@
+numpy>=1.20.0
+opencv-python>=4.5.1
+psycopg2>=2.9.1
+Pillow>=8.4.0
+imgbeddings>=0.1.0
+pip install numpy pillow psycopg2 imgbeddings
+pip install transformers

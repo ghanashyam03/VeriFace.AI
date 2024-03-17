@@ -1,0 +1,46 @@
+<!-- templates/result.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+    <script>
+        let stopUpdating = false;
+
+        function updateResult() {
+            if (stopUpdating) return; // Stop updating if stopUpdating is true
+            fetch('/detection/detect')  // Updated endpoint
+                .then(response => response.json())
+                .then(data => {
+                    if (data.match_found) {
+                        document.getElementById('match-status').innerText = 'Match found!';
+                        document.getElementById('match-percentage').innerText = 'Match percentage: ' + data.match_percentage;
+                    } else {
+                        document.getElementById('match-status').innerText = 'No match found!';
+                        document.getElementById('match-percentage').innerText = '';
+                    }
+                    setTimeout(updateResult, 3000); // Update result every 3 seconds
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Start updating result when the page is loaded
+        window.onload = updateResult;
+
+        // Function to stop updating result
+        function stopUpdatingResult() {
+            stopUpdating = true;
+        }
+    </script>
+</head>
+<body>
+    <div class="result-container">
+        <h2 id="match-status"></h2>
+        <p id="match-percentage"></p>
+    </div>
+    <button onclick="stopUpdatingResult()">Stop</button>
+</body>
+</html>
