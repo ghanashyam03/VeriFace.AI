@@ -11,12 +11,6 @@ import threading
 
 app = Flask(__name__, static_url_path='/static')
 
-
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
-mtcnn = MTCNN(keep_all=True, device=device)
-
-
 def is_ai_generated(image_path):
     API_URL = "https://api-inference.huggingface.co/models/umm-maybe/AI-image-detector"
     headers = {"Authorization": "Bearer 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"}
@@ -25,15 +19,32 @@ def is_ai_generated(image_path):
         data = f.read()
     
     response = requests.post(API_URL, headers=headers, data=data)
-    result = response.json()
+    
+    try:
+        result = response.json()
+    except ValueError:
+        print("Error parsing JSON response")
+        return False  # Handle the error appropriately
+    
     print("API Response:", result) 
     
-    for item in result:
-        if item['label'] == 'artificial' and item['score'] > 0.50:
-            return True
+    if isinstance(result, list):  # Check if result is a list
+        for item in result:
+            if isinstance(item, dict):  # Check if item is a dictionary
+                if item.get('label') == 'artificial' and item.get('score', 0) > 0.50:
+                    return True
+            else:
+                print("Invalid item format:", item)
+    else:
+        print("Invalid result format:", result)
+    
     return False
 
 
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
+mtcnn = MTCNN(keep_all=True, device=device)
 
 def extract_face_embeddings(image):
     faces = mtcnn(image)
@@ -43,19 +54,18 @@ def extract_face_embeddings(image):
     else:
         return None
 
-# Function to calculate cosine similarity between embeddings
 def cosine_similarity(embedding1, embedding2):
-    embedding1_np = embedding1.detach().numpy().flatten()  # Flatten the embedding
-    embedding2_np = embedding2.detach().numpy().flatten()  # Flatten the embedding
+    embedding1_np = embedding1.detach().numpy().flatten()
+    embedding2_np = embedding2.detach().numpy().flatten()
     dot_product = np.dot(embedding1_np, embedding2_np)
     norm1 = np.linalg.norm(embedding1_np)
     norm2 = np.linalg.norm(embedding2_np)
     cosine_similarity = dot_product / (norm1 * norm2)
-    return float(cosine_similarity)  # Convert to float
+    return float(cosine_similarity)
 
-# Function to load and preprocess images from a directory
 def load_images_and_extract_embeddings(directory):
     embeddings = []
+    filenames = []
     for filename in os.listdir(directory):
         if filename.endswith(".jpg") or filename.endswith(".png"):
             filepath = os.path.join(directory, filename)
@@ -65,9 +75,9 @@ def load_images_and_extract_embeddings(directory):
                 embedding = extract_face_embeddings(image)
                 if embedding is not None:
                     embeddings.append(embedding)
-    return embeddings
+                    filenames.append(filename)
+    return embeddings, filenames
 
-# Load and preprocess embeddings of stored faces
 stored_embeddings, stored = load_images_and_extract_embeddings(r'C:\Users\DELL\Desktop\ghana\Face_detection\ai_detected_images\stored-faces')
 
 
@@ -83,10 +93,8 @@ def check_matched_image(frame_embedding, stored_embeddings, stored, threshold=0.
     return False, 0, None
 
 
-# Initialize the video capture object
 cap = cv2.VideoCapture(0)
 
-# Generator function to get frames from the webcam
 def webcam_gen():
     while True:
         ret, frame = cap.read()
@@ -111,7 +119,6 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/detection/detect')
-
 def detect():
     match_found = False
     match_percentage = 0
@@ -125,7 +132,6 @@ def detect():
                 if match_found:
                     break
     return jsonify({'match_found': match_found, 'match_percentage': match_percentage, 'matched_filename': matched_filename})
-
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload_file():
