@@ -1,16 +1,22 @@
-<!-- templates/result.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style3.css') }}">
-
     <title>Result</title>
 </head>
 <body>
-    <h1>Result</h1>
-    <p>{{ message }}</p>
+
+  
+    <div class="container">
+        <div class="result">
+            <h1>Result</h1>
+            <!-- Your result content goes here -->
+        </div>
+        <div class="content">
+            <p>{{ message }}</p>
+        </div>
+    </div>
 </body>
 </html>

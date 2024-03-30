@@ -1,26 +1,92 @@
-<!-- templates/index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face Detection</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
     
 </head>
 <body>
+    <style>
+           /* Base styles */
+           body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 16px;
+            color: #333;
+            background-color: #dcedf2;
+        }
+
+        /* Layout containers */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container2 {
+            flex-direction: column;
+            gap: 1rem;
+            border: 2px solid #333;
+            border-radius: 20px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+            width: 50%;
+            min-height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #fff;
+        }
+
+        /* Heading */
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Buttons */
+        button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #292929;
+            opacity: 1;
+        }
+
+        /* Accessibility improvements */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button:focus {
+            outline: 2px solid #333;
+        }
+    </style>
     <div class="container">
-        <h1>Face Detection</h1>
-        <button id="startBtn" onclick="startDetection()">Detect</button>
-        <button id="stopBtn" style="display:none;" onclick="stopDetection()">Stop</button>
-        <div class="video-container">
-            <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Video feed">
-        </div>
-        <div id="result" style="display:none;">
-            <p id="match-status"></p>
-            <p id="match-percentage"></p>
-            <p id="matched-filename"    ></p>
+        <div class="container2">
+            <h1>Face Detection</h1>
+            <button id="startBtn" onclick="startDetection()">Detect</button>
+            <button id="stopBtn" style="display:none;" onclick="stopDetection()">Stop</button>
+            <div class="video-container">
+                <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Video feed">
+            </div>
+            <div id="result" style="display: none;">
+                <p id="match-status"></p>
+                <p id="match-percentage"></p>
+                <p id="matched-filename"></p>
+            </div>
         </div>
     </div>
     <script>
@@ -41,7 +107,7 @@
         }
 
         function fetchResults() {
-            fetch('/detection/detect')  // Updated endpoint
+            fetch('/detection/detect')
                 .then(response => response.json())
                 .then(data => {
                     if (data.match_found) {
