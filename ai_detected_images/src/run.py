@@ -78,7 +78,7 @@ def load_images_and_extract_embeddings(directory):
                     filenames.append(filename)
     return embeddings, filenames
 
-stored_embeddings, stored = load_images_and_extract_embeddings(r'C:\Users\DELL\Desktop\ghana\Face_detection\ai_detected_images\stored-faces')
+stored_embeddings, stored = load_images_and_extract_embeddings(r'C:\Users\hp\OneDrive\Desktop\detetction\ai_detected_images\stored-faces')
 
 
 
@@ -149,7 +149,7 @@ def upload_file():
         # If the file is selected and it is an allowed type, save it
         if file:
             # Specify the upload directory
-            upload_folder = r'C:\Users\DELL\Desktop\ghana\Face_detection\ai_detected_images\stored-faces'
+            upload_folder = r'C:\Users\hp\OneDrive\Desktop\detetction\ai_detected_images\stored-faces'
             
             # Save the file to the specified directory
             image_path = os.path.join(upload_folder, file.filename)
