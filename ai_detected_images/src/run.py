@@ -14,7 +14,7 @@ from firebase_admin import credentials, firestore
 
 app = Flask(__name__, static_url_path='/static')
 
-cred = credentials.Certificate(r"C:\Users\hp\OneDrive\Desktop\detetction\facedec-954c6-firebase-adminsdk-gd325-59f0f85612.json")
+cred = credentials.Certificate(r"C:\Users\hp\Downloads\model1\facedec-954c6-firebase-adminsdk-gd325-59f0f85612.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
