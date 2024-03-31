@@ -8,8 +8,15 @@ import numpy as np
 import torch
 from facenet_pytorch import InceptionResnetV1, MTCNN, extract_face
 import threading
+import firebase_admin
+from firebase_admin import credentials, firestore
+
 
 app = Flask(__name__, static_url_path='/static')
+
+cred = credentials.Certificate(r"C:\Users\hp\OneDrive\Desktop\detetction\facedec-954c6-firebase-adminsdk-gd325-59f0f85612.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 def is_ai_generated(image_path):
     API_URL = "https://api-inference.huggingface.co/models/umm-maybe/AI-image-detector"
@@ -107,7 +114,15 @@ def webcam_gen():
 
 @app.route('/')
 def home():
+    return render_template('login.html')
+
+@app.route('/home')
+def dashboard():
     return render_template('home.html')
+
+@app.route('/signup')
+def signup():
+    return render_template('signup.html')
 
 @app.route('/detection')
 def face_detection():
@@ -115,8 +130,7 @@ def face_detection():
 
 @app.route('/detection/video_feed')
 def video_feed():
-    return Response(webcam_gen(),
-mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(webcam_gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/detection/detect')
 def detect():
@@ -163,6 +177,36 @@ def upload_file():
                 return render_template("result1.html", message="Uploaded image is not AI-generated.")
     
     return render_template("upload.html")
+
+@app.route('/login', methods=['POST'])
+def login_post():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    # Check login credentials in Firebase (dummy implementation)
+    # Replace this with your actual Firebase authentication logic
+    user_ref = db.collection('users').document(username)
+    user_data = user_ref.get().to_dict()
+
+    if user_data and user_data['password'] == password:
+        return redirect(url_for('dashboard'))  # Redirect to home page after successful login
+    else:
+        return 'Invalid username or password'
+
+@app.route('/signup', methods=['POST'])
+def signup_post():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    # Save user data to Firebase (dummy implementation)
+    # Replace this with your actual Firebase authentication logic
+    user_ref = db.collection('users').document(username)
+    user_ref.set({
+        'username': username,
+        'password': password
+    })
+
+    return redirect(url_for('dashboard'))  # Redirect to home page after successful signup
 
 if __name__ == '__main__':
     app.run(debug=True)
