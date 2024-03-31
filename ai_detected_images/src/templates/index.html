@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face Detection</title>
-    
-</head>
-<body>
     <style>
-           /* Base styles */
-           body {
+        /* Base styles */
+        body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-size: 16px;
@@ -64,6 +61,16 @@
             opacity: 1;
         }
 
+        /* Result section */
+        #result {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .details-container {
+            margin-top: 1rem;
+        }
+
         /* Accessibility improvements */
         a {
             text-decoration: none;
@@ -74,53 +81,64 @@
             outline: 2px solid #333;
         }
     </style>
-    <div class="container">
-        <div class="container2">
-            <h1>Face Detection</h1>
-            <button id="startBtn" onclick="startDetection()">Detect</button>
-            <button id="stopBtn" style="display:none;" onclick="stopDetection()">Stop</button>
-            <div class="video-container">
-                <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Video feed">
-            </div>
-            <div id="result" style="display: none;">
-                <p id="match-status"></p>
-                <p id="match-percentage"></p>
-                <p id="matched-filename"></p>
-            </div>
+</head>
+<body>
+
+<div class="container">
+    <div class="container2">
+        <h1>Face Detection</h1>
+        <button id="startBtn" onclick="startDetection()">Detect</button>
+        <button id="stopBtn" style="display:none;" onclick="stopDetection()">Stop</button>
+        <div class="video-container">
+            <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Video feed">
+        </div>
+        <div id="result">
+            <p id="match-status"></p>
+            <p id="match-percentage"></p>
+            <div id="matched-details" class="details-container"></div>
         </div>
     </div>
-    <script>
-        let intervalId;
+</div>
 
-        function startDetection() {
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('stopBtn').style.display = 'block';
-            document.getElementById('result').style.display = 'block';
+<script>
+    let intervalId;
 
-            intervalId = setInterval(fetchResults, 1000);
-        }
+    function startDetection() {
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('stopBtn').style.display = 'block';
+        document.getElementById('result').style.display = 'block';
 
-        function stopDetection() {
-            clearInterval(intervalId);
-            document.getElementById('startBtn').style.display = 'block';
-            document.getElementById('stopBtn').style.display = 'none';
-        }
+        intervalId = setInterval(fetchResults, 1000);
+    }
 
-        function fetchResults() {
-            fetch('/detection/detect')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.match_found) {
-                        document.getElementById('match-status').innerText = 'Match found!';
-                        document.getElementById('match-percentage').innerText = 'Match percentage: ' + data.match_percentage;
-                        document.getElementById('matched-filename').innerText = 'Matched filename: ' + data.matched_filename;
-                    } else {
-                        document.getElementById('match-status').innerText = 'No match found!';
-                        document.getElementById('match-percentage').innerText = '';
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
-    </script>
+    function stopDetection() {
+        clearInterval(intervalId);
+        document.getElementById('startBtn').style.display = 'block';
+        document.getElementById('stopBtn').style.display = 'none';
+    }
+
+    function fetchResults() {
+        fetch('/detection/detect')
+            .then(response => response.json())
+            .then(data => {
+                if (data.match_found) {
+                    document.getElementById('match-status').innerText = 'Match found!';
+                    document.getElementById('match-percentage').innerText = 'Match percentage: ' + data.match_percentage;
+                    const details = data.details;
+                    const detailsContainer = document.getElementById('matched-details');
+                    detailsContainer.innerHTML = ''; // Clear previous content
+                    const detailsHtml = `
+                        <p><strong>Name:</strong> ${details.name}</p>
+                        <p><strong>Age:</strong> ${details.age}</p>
+                        <p><strong>Profession:</strong> ${details.profession}</p>
+                        <p><strong>Gender:</strong> ${details.gender}</p>
+                    `;
+                    detailsContainer.insertAdjacentHTML('beforeend', detailsHtml);
+                } 
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+
 </body>
 </html>
