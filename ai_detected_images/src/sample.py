@@ -11,6 +11,13 @@ import threading
 import firebase_admin
 from firebase_admin import credentials, firestore
 
+from transformers import pipeline
+
+from PIL import Image
+
+
+pipe = pipeline('image-classification', model=r"C:\Users\DELL\Desktop\Face_detection\model", device=-1)
+
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -19,36 +26,33 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 def is_ai_generated(image_path):
-    API_URL = "https://api-inference.huggingface.co/models/umm-maybe/AI-image-detector"
-    headers = {"Authorization": "Bearer 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"}
+    
 
-    with open(image_path, "rb") as f:
-        data = f.read()
-    
-    response = requests.post(API_URL, headers=headers, data=data)
-    
-    try:
-        result = response.json()
-    except ValueError:
-        print("Error parsing JSON response")
-        return False  # Handle the error appropriately
-    
-    print("API Response:", result) 
-    
-    if isinstance(result, list):  # Check if result is a list
-        for item in result:
-            if isinstance(item, dict):  # Check if item is a dictionary
-                if item.get('label') == 'artificial' and item.get('score', 0) > 0.50:
-                    return True
-            else:
-                print("Invalid item format:", item)
+
+    image = Image.open(image_path)
+
+
+    image_data_type = type(image)
+
+
+    print("Data type of the image:", image_data_type)
+
+    a =pipe(image)
+    for item in a:
+
+        if item['label'] == 'FAKE':
+            fake_score = item['score']
+        print(a)
+
+    if fake_score is not None and fake_score < 0.85:
+        print("The image is not ai generates")
+        return False
     else:
-        print("Invalid result format:", result)
+        print("This is ai generated image")
+        return True
+
     
-    return False
-
-
-
+    
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 mtcnn = MTCNN(keep_all=True, device=device)
