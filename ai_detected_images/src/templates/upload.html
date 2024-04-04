@@ -4,32 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload File</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style4.css') }}">
+    <style>
+        /* CSS styles for the page */
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #051C50;
+            color: #fff;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        form {
+            width: 80%;
+            max-width: 400px;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            padding: 2rem;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+        }
+        
+        label,
+        input,
+        select {
+            display: block;
+            margin-bottom: 1rem;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select,
+        input[type="file"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        
+        input[type="submit"] {
+            background-color: #64CDE0;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        
+        input[type="submit"]:hover {
+            background-color: #1e3bcb;
+        }
+    </style>
 </head>
 <body>
-
     <div class="container">
         <h1>Upload an Image</h1>
         <form method="POST" enctype="multipart/form-data">
             <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required><br>
-
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+            
             <label for="age">Age:</label>
-            <input type="number" id="age" name="age" required><br>
-
+            <input type="number" id="age" name="age" placeholder="Enter your age" required>
+            
             <label for="profession">Profession:</label>
-            <input type="text" id="profession" name="profession" required><br>
-
+            <input type="text" id="profession" name="profession" placeholder="Enter your profession" required>
+            
             <label for="gender">Gender:</label>
             <select id="gender" name="gender" required>
+                <option value="" disabled selected>Select gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="other">Other</option>
-            </select><br>
-
+            </select>
+            
             <label for="file">Upload Image:</label>
-            <input type="file" id="file" name="file" accept="image/*" required><br>
-
+            <input type="file" id="file" name="file" accept="image/*" required>
+            
             <input type="submit" value="Upload">
         </form>
     </div>

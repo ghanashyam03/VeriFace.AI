@@ -13,15 +13,19 @@ from firebase_admin import credentials, firestore
 
 from transformers import pipeline
 import csv
+from flask_executor import Executor
+
+
 from PIL import Image
 
 
-pipe = pipeline('image-classification', model=r"C:\Users\DELL\Desktop\Face_detection\model", device=-1)
+pipe = pipeline('image-classification', model=r"C:\Users\lgowrivinod\Desktop\GHANA\detetction\model", device=-1)
 
 
 app = Flask(__name__, static_url_path='/static')
+executor = Executor(app)
 
-cred = credentials.Certificate(r"C:\Users\DELL\Desktop\Face_detection\facedec-954c6-firebase-adminsdk-gd325-59f0f85612.json")
+cred = credentials.Certificate(r"C:\Users\lgowrivinod\Desktop\GHANA\detetction\facedec-954c6-firebase-adminsdk-gd325-59f0f85612.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -98,7 +102,7 @@ def load_images_and_extract_embeddings(directory):
                     filenames.append(filename)
     return embeddings, filenames
 
-stored_embeddings, stored = load_images_and_extract_embeddings(r'C:\Users\DELL\Desktop\Face_detection\ai_detected_images\stored-faces')
+stored_embeddings, stored = load_images_and_extract_embeddings(r'C:\Users\lgowrivinod\Desktop\GHANA\detetction\ai_detected_images\stored-faces')
 
 
 
@@ -142,11 +146,27 @@ def face_detection():
 
 @app.route('/detection/video_feed')
 def video_feed():
-    return Response(webcam_gen(),
-mimetype='multipart/x-mixed-replace; boundary=frame')
+    def generate_frames():
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame_bytes = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+# Add debug logging for Flask requests
+@app.after_request
+def after_request(response):
+    print(f"{request.method} {request.url} {response.status}")
+    return response
 
 
-csv_file_path = r'C:\Users\DELL\Desktop\Face_detection\ai_detected_images\uploaded_images.csv'
+
+csv_file_path = r'C:\Users\lgowrivinod\Desktop\GHANA\detetction\ai_detected_images\uploaded_images.csv'
 def get_image_details(filename):
     with open(csv_file_path, newline='') as csvfile:
         csv_reader = csv.reader(csvfile)
@@ -193,7 +213,7 @@ def upload_file():
         # If the file is selected and it is an allowed type, save it
         if file:
             # Specify the upload directory
-            upload_folder = r'C:\Users\DELL\Desktop\Face_detection\ai_detected_images\stored-faces'
+            upload_folder = r'C:\Users\lgowrivinod\Desktop\GHANA\detetction\ai_detected_images\stored-faces'
 
             # Save the file to the specified directory
             image_path = os.path.join(upload_folder, file.filename)

@@ -4,99 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 16px;
+            color: #333;
+            background: url("{{ url_for('static', filename='Group 15@2x.png') }}") no-repeat center bottom fixed;
+            background-size: 100%;
+            background-color: #051C50;
+        }
+
+        /* Layout containers */
+        .container {
+            display: flex;
+            justify-content: flex-end; /* Align to the top right */
+            align-items: flex-start; /* Align to the top right */
+            min-height: 100vh;
+            padding: 20px; /* Add padding for better spacing */
+            border: 2px solid #fff; /* White border around the container */
+        }
+
+        .container2 {
+            flex-direction: column;
+            gap: 1rem;
+            width: 50%;
+            min-height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #051C50; /* Light background for better contrast */
+            padding: 2rem; /* Add some padding for breathing room */
+        }
+
+        /* Heading */
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #fff;
+        }
+
+        /* Buttons */
+        button {
+            background-color: #fff; /* White background */
+            color: #051C50; /* Text color */
+            border: none;
+            padding: 15px 30px; /* Increased padding for larger buttons */
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            margin-top: 20px; /* Adjust margin to bring buttons down */
+            font-size: 1.2rem; /* Increase button text size */
+        }
+
+        button:hover {
+            background-color: #9ccee0; /* Darker shade on hover */
+            opacity: 1; /* Remove hover opacity reduction */
+        }
+
+        /* Accessibility improvements */
+        a {
+            text-decoration: none; /* Remove default underline */
+            color: inherit; /* Inherit text color from parent element */
+        }
+
+        button:focus {
+            outline: 2px solid #333; /* Focus ring for better keyboard navigation */
+        }
+
+        .bottom-left-image {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 0; 
+            width: 40%;
+        }
+    </style>
 </head>
 <body>
-  <style>
- 
- body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        font-size: 16px;
-        color: #333;
-        background: url('Group 15@2x.png ') no-repeat center bottom fixed;
-        background-size: 100%;
-        background-color: #051C50;
-    }
-
-    /* Layout containers */
-    .container {
-        display: flex;
-        justify-content: flex-end; /* Align to the top right */
-        align-items: flex-start; /* Align to the top right */
-        min-height: 100vh;
-        padding: 20px; /* Add padding for better spacing */
-        border: 2px solid #fff; /* White border around the container */
-    }
-
-    .container2 {
-        flex-direction: column;
-        gap: 1rem;
-        width: 50%;
-        min-height: 60vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #051C50; /* Light background for better contrast */
-        padding: 2rem; /* Add some padding for breathing room */
-    }
-
-    /* Heading */
-    h1 {
-        font-size: 3rem;
-        margin-bottom: 2rem;
-        text-align: center;
-        color: #fff;
-    }
-
-    /* Buttons */
-    button {
-        background-color: #fff; /* White background */
-        color: #051C50; /* Text color */
-        border: none;
-        padding: 15px 30px; /* Increased padding for larger buttons */
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        margin-top: 20px; /* Adjust margin to bring buttons down */
-        font-size: 1.2rem; /* Increase button text size */
-    }
-
-    button:hover {
-        background-color: #9ccee0; /* Darker shade on hover */
-        opacity: 1; /* Remove hover opacity reduction */
-    }
-
-    /* Accessibility improvements */
-    a {
-        text-decoration: none; /* Remove default underline */
-        color: inherit; /* Inherit text color from parent element */
-    }
-
-    button:focus {
-        outline: 2px solid #333; /* Focus ring for better keyboard navigation */
-    }
-
-    .bottom-left-image {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        z-index: 0; 
-        width: 40%;
-    }
-
-  </style>
     <div class="background">
         <div class="container">
             <div class="container2">
                 <h1>Missing Person Identification System</h1>
                 <a href="/detection"><button>Face Detection</button></a>
                 <a href="/upload"><button>Upload Image</button></a>
-                
             </div>
         </div>
         <!-- Bottom left image -->
-        <img src="2464735 1@2x(1).png" alt="Bottom Left Image" class="bottom-left-image">
+        <img src="{{ url_for('static', filename='2464735 1@2x(1).png') }}" alt="Bottom Left Image" class="bottom-left-image">
     </div>
 </body>
 </html>

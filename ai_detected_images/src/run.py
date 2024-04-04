@@ -12,7 +12,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 from transformers import pipeline
-
+import csv
 from PIL import Image
 
 
@@ -65,13 +65,22 @@ def extract_face_embeddings(image):
     else:
         return None
 
+import numpy as np
+
 def cosine_similarity(embedding1, embedding2):
     embedding1_np = embedding1.detach().numpy().flatten()
     embedding2_np = embedding2.detach().numpy().flatten()
+    
+    # Reshape embeddings to a common dimension (e.g., 512)
+    common_dimension = 512
+    embedding1_np = np.resize(embedding1_np, common_dimension)
+    embedding2_np = np.resize(embedding2_np, common_dimension)
+    
     dot_product = np.dot(embedding1_np, embedding2_np)
     norm1 = np.linalg.norm(embedding1_np)
     norm2 = np.linalg.norm(embedding2_np)
     cosine_similarity = dot_product / (norm1 * norm2)
+    
     return float(cosine_similarity)
 
 def load_images_and_extract_embeddings(directory):
@@ -89,7 +98,7 @@ def load_images_and_extract_embeddings(directory):
                     filenames.append(filename)
     return embeddings, filenames
 
-stored_embeddings, stored = load_images_and_extract_embeddings(r'C:\Users\DELL\Desktop\ghana\Face_detection\ai_detected_images\stored-faces')
+stored_embeddings, stored = load_images_and_extract_embeddings(r'C:\Users\DELL\Desktop\Face_detection\ai_detected_images\stored-faces')
 
 
 
@@ -136,6 +145,17 @@ def video_feed():
     return Response(webcam_gen(),
 mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
+csv_file_path = r'C:\Users\DELL\Desktop\Face_detection\ai_detected_images\uploaded_images.csv'
+def get_image_details(filename):
+    with open(csv_file_path, newline='') as csvfile:
+        csv_reader = csv.reader(csvfile)
+        for row in csv_reader:
+            if len(row) >= 4 and row[-1] == filename:
+                print(row) 
+                return {'name': row[0], 'age': row[1], 'profession': row[2], 'gender': row[3]}
+    return None
+
 @app.route('/detection/detect')
 def detect():
     match_found = False                    
@@ -148,8 +168,14 @@ def detect():
             if frame_embedding is not None:
                 match_found, match_percentage, matched_filename = check_matched_image(frame_embedding, stored_embeddings, stored)
                 if match_found:
-                    break
-    return jsonify({'match_found': match_found, 'match_percentage': match_percentage, 'matched_filename': matched_filename})
+                    # Get details of the matched image from CSV file
+                    image_details = get_image_details(matched_filename)
+                    if image_details:
+                        return jsonify({'match_found': match_found, 'match_percentage': match_percentage, 'details': image_details})
+                    else:
+                        return jsonify({'error': 'Details not found for the matched image.'})
+
+
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload_file():
@@ -157,29 +183,44 @@ def upload_file():
         # Check if the POST request has the file part
         if "file" not in request.files:
             return "No file part"
-        
+
         file = request.files["file"]
-        
+
         # If the user does not select a file, the browser submits an empty file without a filename
         if file.filename == "":
             return "No selected file"
-        
+
         # If the file is selected and it is an allowed type, save it
         if file:
             # Specify the upload directory
-            upload_folder = r'C:\Users\DELL\Desktop\ghana\Face_detection\ai_detected_images\stored-faces'
-            
+            upload_folder = r'C:\Users\DELL\Desktop\Face_detection\ai_detected_images\stored-faces'
+
             # Save the file to the specified directory
             image_path = os.path.join(upload_folder, file.filename)
             file.save(image_path)
-            
+
+            # Extract additional information from the form
+            name = request.form.get('name')
+            age = request.form.get('age')
+            profession = request.form.get('profession')
+            gender = request.form.get('gender')
+
             # Check if the uploaded image is AI-generated
             is_generated = is_ai_generated(image_path)
+
+            # Save data to CSV file
+            with open(csv_file_path, 'a', newline='') as csvfile:
+                csv_writer = csv.writer(csvfile)
+                filename_without_ext = os.path.splitext(file.filename)[0]
+                # Write a row with the collected data
+                csv_writer.writerow([name, age, profession, gender, filename_without_ext])
+
+
             if is_generated:
                 return render_template("result1.html", message="Uploaded image is AI-generated.")
             else:
                 return render_template("result1.html", message="Uploaded image is not AI-generated.")
-    
+
     return render_template("upload.html")
 
 @app.route('/login', methods=['POST'])

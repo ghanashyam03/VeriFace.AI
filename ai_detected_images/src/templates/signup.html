@@ -15,7 +15,7 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: url('Group 15@2x.png ') no-repeat center bottom fixed;
+  background: url("{{ url_for('static', filename='Group 15@2x.png') }}") no-repeat center bottom fixed;
   background-size: 100%;
   font-size: 16px;
   color: #333;
@@ -142,9 +142,9 @@ button:focus {
                 <input type="password" name="password" placeholder="Password" required>
                 <button type="submit">Sign Up</button>
             </form>
-            <p> Already have an account?<a href="/login">Sign Up</a></p>
+            <p> Already have an account?<a href="/">Login</a></p>
         </div>
-        <img src="ai-article-pic10-removebg-preview.png" alt="Bottom Left Image" class="left-image"> 
+        <img src="ai-article-pic10.jpg" alt="Bottom Left Image" class="left-image"> 
     </div>
 </body>
 </html>
